@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jfm;
+package jfm.soundelement;
 
 /**
  *
  * @author LostMekka
  */
-public class Envelope {
+public class Envelope implements CanPlayNotes{
 	
 	public static final double DEFAULT_RELEASE_CUTOFF = 0.05;
 	
@@ -23,25 +23,7 @@ public class Envelope {
 		this.release = release;
 	}
 	
-	public boolean isPlaying(){
-		return (state != -1);
-	}
-	
-	public void reset(){
-		state = -1;
-		totalTime = 0;
-		envLevel = 0;
-	}
-	
-	public void startNote(){
-		reset();
-		state = 0;
-	}
-	
-	public void endNote(){
-		if(state != -1) state = 3;
-	}
-	
+	@Override
 	public void tick(double elapsedTime){
 		if(state == -1) return;
 		totalTime += elapsedTime;
@@ -74,8 +56,32 @@ public class Envelope {
 		}
 	}
 	
-	public double getCurrValue(){
+	@Override
+	public double getCurrValue(double input){
 		return envLevel;
+	}
+	
+	@Override
+	public boolean isPlaying(){
+		return (state != -1);
+	}
+	
+	@Override
+	public void reset(){
+		state = -1;
+		totalTime = 0;
+		envLevel = 0;
+	}
+	
+	@Override
+	public void noteKeyPressed(double frequency, double volume){
+		reset();
+		state = 0;
+	}
+	
+	@Override
+	public void noteKeyReleased(){
+		if(state != -1) state = 3;
 	}
 	
 }

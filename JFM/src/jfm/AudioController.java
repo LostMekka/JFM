@@ -4,11 +4,15 @@
  */
 package jfm;
 
+import jfm.soundelement.Envelope;
+import jfm.soundelement.Operator;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import jfm.myinstruments.WowBass;
+import jfm.soundelement.Instrument;
 
 /**
  *
@@ -20,8 +24,7 @@ public class AudioController {
 	public static final double SAMPLE_LENGTH = 1d / (double)SAMPLE_RATE;
 	
 	SourceDataLine line = null;
-	Operator op1 = new Operator(100, 1, new Envelope(2, 1, 0.6, 0.999985));
-	Operator op2 = new Operator(49.2, 12, new Envelope(2, 1, 0.85, 0.99999));
+	Instrument inst = new WowBass();
 
 	public boolean init(){
 		AudioFormat format = new AudioFormat(SAMPLE_RATE, 16, 1, true, true);
@@ -53,24 +56,21 @@ public class AudioController {
 		long samples = 0;
 		boolean stop = false;
 		System.out.println("starting note");
-		op1.startNote();
-		op2.startNote();
-		while(op1.isPlaying()){
+		inst.noteKeyPressed(49, 1);
+		while(inst.isPlaying()){
 			for(int i=0; i<512; i+=2){
-				op1.tick(SAMPLE_LENGTH);
-				op2.tick(SAMPLE_LENGTH);
-				short val = (short)(op1.getCurrValue(op2.getCurrValue(0)) * 7000d);
+				inst.tick(SAMPLE_LENGTH);
+				short val = (short)(inst.getCurrValue(0) * 7000d);
 				buffer[i] = (byte) ((val & 0xff00) >> 8);
 				buffer[i + 1] = (byte) (val & 0x00ff);
 			}
 			line.write(buffer, 0, 512);
-			if(stop) continue;
+			if(stop) continue; // i like this line :D
 			samples += 512;
-			if(samples > SAMPLE_RATE * 8){
+			if(samples > SAMPLE_RATE * 12){
 				stop = true;
 				System.out.println("stopping note");
-				op1.endNote();
-				op2.endNote();
+				inst.noteKeyReleased();
 			}
 		}
 	}
