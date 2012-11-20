@@ -14,6 +14,8 @@ public class JFM {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		// TODO code application logic here
+		AudioController ctrl = new AudioController();
+		ctrl.init();
+		ctrl.playANoteAndMakeMeAHappyBeing();
 	}
 }
