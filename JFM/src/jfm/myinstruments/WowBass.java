@@ -16,28 +16,25 @@ public class WowBass extends Instrument{
 
 	public WowBass() {
 		super(2, 0);
-		setOp(0, new Envelope(2, 1, 0.6, 0.999985));
-		setOp(1, new Envelope(2.5, 1.4, 0.7, 0.999992));
+		setOp(0, new Envelope(2, 1, 0.6, 2));
+		setOp(1, new Envelope(3.5, 2, 0.6, 3));
 	}
 
 	@Override
 	public double getCurrValue(double input) {
-		return getOpVal(0, getOpVal(1, 0));
+		return getOpVal(0, getOpVal(1, 0) * 19);
 	}
 
 	@Override
 	protected double getFinalFrequency(int opNr, double originalFrequency) {
 		if(opNr == 1){
-			return originalFrequency * 0.492;
+			return originalFrequency * 0.49;
 		}
 		return originalFrequency;
 	}
 
 	@Override
 	protected double getFinalVolume(int opNr, double originalVolume) {
-		if(opNr == 1){
-			return originalVolume * 14;
-		}
 		return originalVolume;
 	}
 	

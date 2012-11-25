@@ -10,9 +10,7 @@ package jfm.soundelement;
  */
 public class Envelope implements CanPlayNotes{
 	
-	public static final double DEFAULT_RELEASE_CUTOFF = 0.05;
-	
-	public double attack, decay, sustain, release, releaseCutoff = DEFAULT_RELEASE_CUTOFF;
+	public double attack, decay, sustain, release, attackStart;
 	private int state;
 	private double totalTime, envLevel;
 
@@ -21,6 +19,7 @@ public class Envelope implements CanPlayNotes{
 		this.decay = decay;
 		this.sustain = sustain;
 		this.release = release;
+		reset();
 	}
 	
 	@Override
@@ -30,7 +29,7 @@ public class Envelope implements CanPlayNotes{
 		switch(state){
 			case 0:
 				if(totalTime < attack){
-					envLevel = totalTime / attack;
+					envLevel = attackStart + (1d - attackStart) * totalTime / attack;
 				} else {
 					envLevel = 1;
 					state = 1;
@@ -38,7 +37,6 @@ public class Envelope implements CanPlayNotes{
 				}
 				break;
 			case 1:
-				envLevel *= decay;
 				if(totalTime < decay){
 					envLevel = 1d - (1d - sustain) * totalTime / decay;
 				} else {
@@ -46,11 +44,14 @@ public class Envelope implements CanPlayNotes{
 					state = 2;
 					totalTime = 0;
 				}
+				break;
 			case 3:
-				envLevel *= release;
-				if(envLevel < releaseCutoff){
+				if(totalTime < release){
+					envLevel = sustain * (1d - totalTime / release);
+				} else {
 					envLevel = 0;
 					state = -1;
+					totalTime = 0;
 				}
 				break;
 		}
@@ -75,13 +76,18 @@ public class Envelope implements CanPlayNotes{
 	
 	@Override
 	public void noteKeyPressed(double frequency, double volume){
+		attackStart = envLevel;
 		reset();
+		envLevel = attackStart;
 		state = 0;
 	}
 	
 	@Override
 	public void noteKeyReleased(){
-		if(state != -1) state = 3;
+		if(state != -1){
+			state = 3;
+			totalTime = 0;
+		}
 	}
 	
 }

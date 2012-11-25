@@ -4,8 +4,6 @@
  */
 package jfm;
 
-import jfm.soundelement.Envelope;
-import jfm.soundelement.Operator;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -37,7 +35,7 @@ public class AudioController {
 		}
 		try {
 			line = (SourceDataLine) AudioSystem.getLine(info);
-			line.open(format, 1024 * 2);
+			line.open(format, 1024 * 4);
 		} catch (LineUnavailableException ex) {
 			// Handle the error.
 			System.err.println("line unavailable");
@@ -60,7 +58,7 @@ public class AudioController {
 		while(inst.isPlaying()){
 			for(int i=0; i<512; i+=2){
 				inst.tick(SAMPLE_LENGTH);
-				short val = (short)(inst.getCurrValue(0) * 7000d);
+				short val = (short)(inst.getCurrValue(0) * 6000d);
 				buffer[i] = (byte) ((val & 0xff00) >> 8);
 				buffer[i + 1] = (byte) (val & 0x00ff);
 			}
